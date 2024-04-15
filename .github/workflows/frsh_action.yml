@@ -19,3 +19,8 @@ jobs:
       - name: Run Artillery Tests
         run: |
           artillery run fresh_art.yml --output fresh_art.json && artillery report fresh_art.json --output index.html
+      - name: Publish HTML report as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: artillery-fresh-report
+          path: index.html
