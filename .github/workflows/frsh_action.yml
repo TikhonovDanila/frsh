@@ -22,5 +22,5 @@ jobs:
       - name: Publish HTML report as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: artillery-fresh-report
-          path: index.html
+          name: index.html
+          path: .
