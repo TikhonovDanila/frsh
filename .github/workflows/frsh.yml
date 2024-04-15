@@ -1,25 +1,57 @@
-name: Run Artillery Tests
+name: Deploy HTML Report
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Install Node.js
+    strategy:
+      matrix:
+        node-version: [19.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '19'
-      - name: Install Artillery (Optional)
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install artillery globally
         run: |
           npm install -g artillery
 
-      - name: Run Artillery tests
-        uses: kenju/github-actions-artillery@master
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          docker build . -t fresh:latest
+
+      - name: Run tests with Artillery
+        run: |
+          docker run fresh:latest sh -c "artillery run fresh.yml --output /app/output.json && artillery report /app/output.json --output /app/index.html"
+
+      - name: Copy HTML report from container
+        run: |
+          docker cp $(docker ps -lq):/app/index.html ./index.html
+          docker cp $(docker ps -lq):/app/output.json ./output.json 
+
+      - name: Publish HTML report as artifact
+        uses: actions/upload-artifact@v2
         with:
-          config: 'fresh.yml'
-          output: 'index.html fresh.json'
+          name: index
+          path: ./
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+
+
+
