@@ -14,6 +14,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '19'
+      - name: Install Artillery (Optional)
+        run: |
+          npm install -g artillery
 
       - name: Run Artillery tests
         uses: kenju/github-actions-artillery@master
