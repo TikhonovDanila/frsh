@@ -21,6 +21,5 @@ jobs:
       - name: Run Artillery tests
         uses: kenju/github-actions-artillery@master
         with:
-          target: 'https://danila-frsh-20.deno.dev'
           config: 'fresh.yml'
           output: 'index.html fresh.json'
