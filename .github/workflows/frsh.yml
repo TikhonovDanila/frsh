@@ -1,0 +1,23 @@
+name: Run Artillery Tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Run Artillery tests
+        uses: kenju/github-actions-artillery@master
+        with:
+          target: 'https://danila-frsh-20.deno.dev'
+          config: 'fresh.yml'
+          output: 'index.html fresh.json'
